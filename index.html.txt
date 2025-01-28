@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<body style="background: black; margin: 0; overflow: hidden;">
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 2;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 5,
+                    y: (Math.random() - 0.5) * 5
+                };
+                this.alpha = 1;
+            }
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            }
+        }
+
+        const particles = [];
+        function createFirework(x, y) {
+            const colors = ['#ff0000', '#00ff00', '#ffff00', '#ff00ff'];
+            for (let i = 0; i < 100; i++) {
+                particles.push(new Particle(x, y, colors[Math.floor(Math.random()*4)]));
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.alpha <= 0) particles.splice(index, 1);
+            });
+            requestAnimationFrame(animate);
+        }
+        
+        canvas.addEventListener('click', (e) => {
+            createFirework(e.clientX, e.clientY);
+        });
+        animate();
+    </script>
+</body>
+</html>
